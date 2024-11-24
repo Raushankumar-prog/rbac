@@ -60,7 +60,7 @@ export default function Home() {
      
       <footer className="w-full bg-gray-900 py-6 text-center">
         <p className="text-sm text-gray-500">
-          © 2024 Your Company Name. All rights reserved.
+          © 2024 RBAC
         </p>
       </footer>
     </div>
