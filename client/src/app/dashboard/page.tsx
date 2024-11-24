@@ -9,10 +9,13 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="flex">
+    <div className="flex h-screen">
+    
       <Sidebar />
-      <div className="p-4 flex-grow">
-        <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
+
+     
+      <div className="flex-grow p-6 bg-gray-100">
+        <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
         <Table data={sampleData} />
       </div>
     </div>

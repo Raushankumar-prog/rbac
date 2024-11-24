@@ -1,25 +1,53 @@
 "use client";
-import React from "react";
-import { useState } from "react";
+
+import React, { useState } from "react";
 
 const Register = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
-    role: "Viewer", 
+    role: "Viewer",
   });
 
-  const roles = ["Admin", "Manager", "Viewer"]; 
+  const [message, setMessage] = useState<string | null>(null);
+
+  const roles = ["Admin", "Manager", "Viewer"];
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
-    
+    setMessage(null);
+
+    try {
+      const response = await fetch("/api/user", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+          roleId: formData.role, 
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setMessage(`User registered successfully! ID: ${data.user.id}`);
+        setFormData({ name: "", email: "", password: "", role: "Viewer" });
+      } else {
+        const errorData = await response.json();
+        setMessage(`Error: ${errorData.error || "Failed to register user"}`);
+      }
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      setMessage("An unexpected error occurred. Please try again.");
+    }
   };
 
   return (
@@ -96,6 +124,11 @@ const Register = () => {
           Register
         </button>
       </form>
+      {message && (
+        <div className="mt-4 text-center text-sm text-gray-700">
+          {message}
+        </div>
+      )}
     </div>
   );
 };
