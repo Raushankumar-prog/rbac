@@ -24,7 +24,7 @@ const Login = () => {
 
       if (response.ok) {
         setMessage("Login successful!");
-        router.push("/dashboard"); // Redirect to the dashboard
+        router.push("/dashboard"); 
       } else {
         const errorData = await response.json();
         setMessage(errorData.error || "Invalid credentials. Please try again.");
