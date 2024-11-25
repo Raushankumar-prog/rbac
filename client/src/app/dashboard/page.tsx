@@ -1,5 +1,15 @@
 "use client";
 
+interface Role {
+  name: string;
+}
+
+interface User {
+  name: string;
+  email: string;
+  role?: Role;
+}
+
 import React, { useState, useEffect } from "react";
 import Sidebar from "../../components/Sidebar";
 import Table from "../../components/Table";
@@ -28,7 +38,7 @@ const Dashboard = () => {
         const response = await fetch("/api/users");
         const data = await response.json();
         if (data.success) {
-          const users = data.users.map((user: any) => ({
+          const users = data.users.map((user: User) => ({
             Name: user.name,
             Role: user.role?.name || "No Role Assigned",
             Email: user.email,
