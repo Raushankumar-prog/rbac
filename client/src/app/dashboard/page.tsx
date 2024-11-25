@@ -11,7 +11,7 @@ const Dashboard = () => {
   return (
     <div className="flex h-screen">
     
-      <Sidebar />
+     <div className="mt-30"><Sidebar /></div> 
 
      
       <div className="flex-grow p-6 bg-gray-100">

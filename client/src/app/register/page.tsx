@@ -1,20 +1,21 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const Register = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
-    role: "Viewer",
+    roleId: "", 
   });
 
+  const [roles, setRoles] = useState<string[]>([]);
   const [message, setMessage] = useState<string | null>(null);
 
-  const roles = ["Admin", "Manager", "Viewer"];
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
@@ -23,7 +24,7 @@ const Register = () => {
     setMessage(null);
 
     try {
-      const response = await fetch("/api/user", {
+      const response = await fetch("/api/users", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -32,14 +33,15 @@ const Register = () => {
           name: formData.name,
           email: formData.email,
           password: formData.password,
-          roleId: formData.role, 
+          roleId: formData.roleId,
+      
         }),
       });
 
       if (response.ok) {
         const data = await response.json();
         setMessage(`User registered successfully! ID: ${data.user.id}`);
-        setFormData({ name: "", email: "", password: "", role: "Viewer" });
+        setFormData({ name: "", email: "", password: "", roleId: roles[0] || "" });
       } else {
         const errorData = await response.json();
         setMessage(`Error: ${errorData.error || "Failed to register user"}`);
@@ -49,6 +51,24 @@ const Register = () => {
       setMessage("An unexpected error occurred. Please try again.");
     }
   };
+
+  useEffect(() => {
+    const fetchRoles = async () => {
+      try {
+        const res = await fetch("/api/roles");
+        if (!res.ok) throw new Error("Failed to fetch roles");
+        const data = await res.json();
+        if (data.success) {
+          setRoles(data.roles.map((role: {name: string }) => role.name));
+          setFormData((prev) => ({ ...prev, roleId: data.roles[0]?.name || "" }));
+        }
+      } catch (error) {
+        console.error("Error fetching roles:", error);
+      }
+    };
+
+    fetchRoles();
+  }, []);
 
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
@@ -100,19 +120,19 @@ const Register = () => {
           />
         </div>
         <div className="mb-4">
-          <label htmlFor="role" className="block text-gray-700">
+          <label htmlFor="roleId" className="block text-gray-700">
             Role
           </label>
           <select
-            id="role"
-            name="role"
+            id="roleId"
+            name="roleId"
             className="w-full p-2 border border-gray-300 rounded"
-            value={formData.role}
+            value={formData.roleId}
             onChange={handleChange}
           >
-            {roles.map((role) => (
-              <option key={role} value={role}>
-                {role}
+            {roles.map((roleId) => (
+              <option key={roleId} value={roleId}>
+                {roleId}
               </option>
             ))}
           </select>

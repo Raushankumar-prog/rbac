@@ -5,19 +5,28 @@ import { useState, useEffect } from "react";
 interface Role {
   id: string;
   name: string;
+  permissionName: string; 
+}
+
+interface Permission {
+  id: string;
+  name: string;
 }
 
 const Manager = () => {
   const [roles, setRoles] = useState<Role[]>([]);
+  const [permissions, setPermissions] = useState<Permission[]>([]);
   const [newRole, setNewRole] = useState<string>("");
-  const [editRole, setEditRole] = useState<Role>({ id: "", name: "" });
+  const [newPermissionName, setNewPermissionName] = useState<string>("");
+  const [editRole, setEditRole] = useState<Role>({ id: "", name: "", permissionName: "" });
   const [loading, setLoading] = useState<boolean>(false);
 
-  // Fetch roles
+  
   useEffect(() => {
     const fetchRoles = async () => {
       try {
         const res = await fetch("/api/roles");
+        if (!res.ok) throw new Error("Failed to fetch roles");
         const data = await res.json();
         if (data.success) {
           setRoles(data.roles);
@@ -30,20 +39,45 @@ const Manager = () => {
     fetchRoles();
   }, []);
 
-  // Create a new role
+  
+  
+
+  useEffect(() => {
+    const fetchPermissions = async () => {
+      try {
+         const res = await fetch('/api/permission');
+       
+        const data = await res.json();
+        if (data.success) {
+          setPermissions(data.permissions);
+        }
+      } catch (error) {
+        console.error("Error fetching permissions:", error);
+      }
+    };
+
+    fetchPermissions();
+  }, []);
+
+
+
+
+
+
   const addRole = async () => {
-    if (!newRole.trim()) return;
+    if (!newRole.trim() || !newPermissionName) return;
     setLoading(true);
     try {
       const res = await fetch("/api/roles", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: newRole }),
+        body: JSON.stringify({ name: newRole, permissionName: newPermissionName }),
       });
       const data = await res.json();
       if (data.success) {
         setRoles([...roles, data.role]);
         setNewRole("");
+        setNewPermissionName("");
       }
     } catch (error) {
       console.error("Error adding role:", error);
@@ -52,9 +86,8 @@ const Manager = () => {
     }
   };
 
-  // Update a role
   const updateRole = async () => {
-    if (!editRole.name.trim()) return;
+    if (!editRole.name.trim() || !editRole.permissionName) return;
     setLoading(true);
     try {
       const res = await fetch("/api/roles", {
@@ -64,12 +97,8 @@ const Manager = () => {
       });
       const data = await res.json();
       if (data.success) {
-        setRoles(
-          roles.map((role) =>
-            role.id === data.role.id ? data.role : role
-          )
-        );
-        setEditRole({ id: "", name: "" });
+        setRoles(roles.map((role) => (role.id === data.role.id ? data.role : role)));
+        setEditRole({ id: "", name: "", permissionName: "" });
       }
     } catch (error) {
       console.error("Error updating role:", error);
@@ -78,7 +107,7 @@ const Manager = () => {
     }
   };
 
-  // Delete a role
+  
   const deleteRole = async (id: string) => {
     setLoading(true);
     try {
@@ -111,6 +140,20 @@ const Manager = () => {
           onChange={(e) => setNewRole(e.target.value)}
           className="border px-2 py-1 mr-2"
         />
+        <select
+          value={newPermissionName}
+          onChange={(e) => setNewPermissionName(e.target.value)}
+          className="border px-2 py-1 mr-2"
+        >
+          <option value="" disabled>
+            Select permission
+          </option>
+          {permissions.map((permission) => (
+            <option key={permission.id} value={permission.name}>
+              {permission.name}
+            </option>
+          ))}
+        </select>
         <button
           onClick={addRole}
           className="bg-blue-500 text-white px-4 py-1"
@@ -135,6 +178,22 @@ const Manager = () => {
                   }
                   className="border px-2 py-1 mr-2"
                 />
+                <select
+                  value={editRole.permissionName}
+                  onChange={(e) =>
+                    setEditRole({ ...editRole, permissionName: e.target.value })
+                  }
+                  className="border px-2 py-1 mr-2"
+                >
+                  <option value="" disabled>
+                    Select permission
+                  </option>
+                  {permissions.map((permission) => (
+                    <option key={permission.id} value={permission.name}>
+                      {permission.name}
+                    </option>
+                  ))}
+                </select>
                 <button
                   onClick={updateRole}
                   className="bg-green-500 text-white px-4 py-1 mr-2"
@@ -143,7 +202,9 @@ const Manager = () => {
                   Save
                 </button>
                 <button
-                  onClick={() => setEditRole({ id: "", name: "" })}
+                  onClick={() =>
+                    setEditRole({ id: "", name: "", permissionName: "" })
+                  }
                   className="bg-gray-500 text-white px-4 py-1"
                 >
                   Cancel
@@ -152,6 +213,7 @@ const Manager = () => {
             ) : (
               <div className="flex items-center">
                 <span className="mr-4">{role.name}</span>
+                <span className="mr-4">({role.permissionName})</span>
                 <button
                   onClick={() => setEditRole(role)}
                   className="bg-yellow-500 text-white px-4 py-1 mr-2"

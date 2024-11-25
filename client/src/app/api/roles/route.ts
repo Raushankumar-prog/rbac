@@ -1,14 +1,27 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
-
 export async function POST(req: Request) {
   try {
-    const { name } = await req.json();
+    const { name, permissionName } = await req.json();
 
-  
+    // Check if the permission exists
+    const permission = await prisma.permission.findUnique({
+      where: { name: permissionName },
+    });
+    if (!permission) {
+      return NextResponse.json(
+        { success: false, error: "Permission not found" },
+        { status: 400 }
+      );
+    }
+
+    // Create the role with the associated permission
     const newRole = await prisma.role.create({
-      data: { name },
+      data: {
+        name,
+        permissionName: permission.name,
+      },
     });
 
     return NextResponse.json({ success: true, role: newRole }, { status: 201 });
@@ -21,12 +34,14 @@ export async function POST(req: Request) {
   }
 }
 
-
 export async function GET() {
   try {
-    
+    // Fetch roles along with their permissions and users
     const roles = await prisma.role.findMany({
-      include: { users: true, permissions: true },
+      include: {
+        permission: true, // Include associated permission details
+        users: true,      // Include associated users
+      },
     });
 
     return NextResponse.json({ success: true, roles });
@@ -41,12 +56,26 @@ export async function GET() {
 
 export async function PUT(req: Request) {
   try {
-    const { id, name } = await req.json();
+    const { id, name, permissionName } = await req.json();
 
-    
+    // Check if the permission exists
+    const permission = await prisma.permission.findUnique({
+      where: { name: permissionName },
+    });
+    if (!permission) {
+      return NextResponse.json(
+        { success: false, error: "Permission not found" },
+        { status: 400 }
+      );
+    }
+
+    // Update the role with the new name and permission
     const updatedRole = await prisma.role.update({
       where: { id },
-      data: { name },
+      data: {
+        name,
+        permissionName: permission.name,
+      },
     });
 
     return NextResponse.json({ success: true, role: updatedRole });
@@ -59,12 +88,11 @@ export async function PUT(req: Request) {
   }
 }
 
-
 export async function DELETE(req: Request) {
   try {
     const { id } = await req.json();
 
-  
+    // Delete the role
     await prisma.role.delete({
       where: { id },
     });

@@ -3,8 +3,8 @@ import Link from "next/link";
 
 const Navbar = () => {
   return (
-    <nav className="bg-gray-800 text-white p-4 flex justify-between items-center">
-      <div className="text-lg font-bold">DevOps Team Manager</div>
+    <nav className="bg-gray-800 text-white p-4 px-15 flex justify-between items-center">
+      <div className="text-lg font-bold  mx-20">DevOps Team Manager</div>
       <ul className="flex space-x-4">
         <li><Link href="/dashboard">Dashboard</Link></li>
         <li><Link href="/login">Login</Link></li>

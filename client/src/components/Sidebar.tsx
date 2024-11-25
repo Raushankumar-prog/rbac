@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { FaUsers, FaUserShield, FaTasks, FaFolder, FaBars, FaTimes } from "react-icons/fa";
+import {  FaUserShield, FaTasks,FaBars, FaTimes } from "react-icons/fa";
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
@@ -23,15 +23,7 @@ const Sidebar = () => {
           {isOpen ? <FaTimes className="text-xl" /> : <FaBars className="text-xl" />}
         </button>
         <ul className="space-y-4">
-          <li>
-            <Link
-              href="/teams"
-              className="flex items-center space-x-3 p-3 hover:bg-gray-700 rounded transition-colors"
-            >
-              <FaUsers className="text-xl" />
-              {isOpen && <span className="text-lg">Teams</span>}
-            </Link>
-          </li>
+         
           <li>
             <Link
               href="/admins"
@@ -50,15 +42,7 @@ const Sidebar = () => {
               {isOpen && <span className="text-lg">Managers</span>}
             </Link>
           </li>
-          <li>
-            <Link
-              href="/resources"
-              className="flex items-center space-x-3 p-3 hover:bg-gray-700 rounded transition-colors"
-            >
-              <FaFolder className="text-xl" />
-              {isOpen && <span className="text-lg">Resources</span>}
-            </Link>
-          </li>
+         
         </ul>
       </div>
     </div>
