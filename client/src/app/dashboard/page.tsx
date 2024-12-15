@@ -56,13 +56,13 @@ const Dashboard = () => {
   return (
     <div className="flex h-screen">
       <Sidebar />
-      <div className="flex-grow p-6 bg-gray-100">
+      <div className="flex-grow p-6 bg-black">
         <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
 
         {/* Sample Data */}
-        <div className="mb-10">
+        <div className="mb-10 bg-black">
           <h2 className="text-xl font-semibold mb-4">Sample Data</h2>
-          <Table data={sampleData} />
+          <Table   data={sampleData} />
         </div>
 
         {/* Fetched Data */}
